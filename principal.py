@@ -197,41 +197,11 @@ def crear_interfaz():
 
     ventana.mainloop()
 
-# Función cliente para enviar archivos continuamente
-def cliente(ip_destino):
-    """Función para enviar archivos."""
-    global ARCHIVOS_ENVIADOS
+# Iniciar el servidor y la interfaz gráfica
+if __name__ == '__main__':
+    # Iniciar servidor en otro hilo
+    hilo_servidor = threading.Thread(target=servidor, daemon=True)
+    hilo_servidor.start()
 
-    while True:
-        for archivo in os.listdir(CARPETA_SYNC):
-            ruta_archivo = os.path.join(CARPETA_SYNC, archivo)
-
-            if archivo not in ARCHIVOS_ENVIADOS and os.path.isfile(ruta_archivo):
-                try:
-                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cliente:
-                        cliente.connect((ip_destino, PUERTO))
-                        cliente.sendall(archivo.encode())  # Enviar el nombre del archivo
-
-                        # Enviar el contenido del archivo
-                        with open(ruta_archivo, 'rb') as f:
-                            cliente.sendfile(f)
-
-                    print(f"[Cliente] Archivo enviado: {archivo}")
-                    ARCHIVOS_ENVIADOS.add(archivo)
-
-                except Exception as e:
-                    print(f"[Cliente] Error al enviar archivo {archivo}: {e}")
-
-        time.sleep(TIEMPO_ESPERA)
-
-# Ejecutar servidor y cliente
-if __name__ == "__main__":
-    servidor_thread = threading.Thread(target=servidor)
-    servidor_thread.start()
-    
-    # Para que el cliente envíe archivos de forma continua, agrega la dirección IP de destino
-    cliente_thread = threading.Thread(target=cliente, args=("192.168.1.13",))
-    cliente_thread.start()
-    
-    # Crear la interfaz gráfica
+    # Crear interfaz gráfica
     crear_interfaz()
