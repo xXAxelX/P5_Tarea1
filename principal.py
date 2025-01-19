@@ -114,7 +114,7 @@ def servidor():
             print(f"[Servidor] Conexión establecida con {addr}")
 
             with conn:
-                # Recibir el nombre del archivo
+                # Recibir el nombre del archivos
                 nombre_archivo = conn.recv(1024).decode()
                 if not nombre_archivo:
                     continue
